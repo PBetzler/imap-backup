@@ -1,0 +1,29 @@
+# Rust build artifacts
+/target/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime files (state DB, lock files)
+*.db
+*.db-wal
+*.db-shm
+*.pid
+state.lock
+
+# Secrets and credentials (never commit these)
+*.pem
+*.key
+*.env
+password*.txt
+
+# Claude Code tooling (agents, local settings)
+.claude/

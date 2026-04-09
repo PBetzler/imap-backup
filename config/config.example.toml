@@ -1,0 +1,114 @@
+# email-backups configuration
+#
+# Copy this file to config.toml and edit the values for your setup.
+# All paths in this file are from the perspective of the running process
+# (inside the container if using Docker, or on the host if running bare metal).
+
+[general]
+# Root directory for Maildir storage. Each account gets a subdirectory here.
+# Inside Docker, this is typically a mounted volume.
+maildir_path = "/data/maildir"
+
+# Path to the SQLite state database. Tracks message fingerprints, locations,
+# folder UID validity, and sync progress. Must be on persistent storage.
+state_db = "/data/state/state.db"
+
+# Logging verbosity: "trace", "debug", "info", "warn", or "error".
+# Can be overridden with the -v / -vv CLI flags or the RUST_LOG env var.
+# Default: "info"
+# log_level = "info"
+
+# Polling interval in seconds for daemon mode (--daemon).
+# Minimum: 60 seconds. Default: 300 (5 minutes).
+# sync_interval_seconds = 300
+
+# Warn if no successful sync has occurred in this many days.
+# Helps detect silently broken configurations. Default: 7.
+# stale_threshold_days = 7
+
+# Maximum email size to download, in bytes. Messages larger than this are
+# skipped. Default: 104857600 (100 MB).
+# max_email_size_bytes = 104857600
+
+# IMAP operation timeout in seconds. Applied to connect, login, fetch, and
+# other IMAP commands. Default: 60.
+# imap_timeout_seconds = 60
+
+# Whether to fsync Maildir writes for crash safety. Disabling this improves
+# performance on NAS devices but risks data loss on power failure.
+# Default: true.
+# fsync_on_write = true
+
+
+# --- Account configuration ---
+#
+# Define one [[account]] block per IMAP account to back up.
+# Account names must be unique. The name is used as the subdirectory name
+# under maildir_path and as the identifier in logs and the state database.
+
+[[account]]
+# Human-readable name for this account. Used as the Maildir subdirectory
+# name and in log messages. Must be unique across all accounts.
+name = "personal"
+
+# IMAP server hostname.
+host = "imap.example.com"
+
+# IMAP server port. Default: 993.
+# port = 993
+
+# Whether to use TLS. Currently only TLS connections are supported.
+# Default: true.
+# tls = true
+
+# IMAP username (usually the full email address).
+username = "user@example.com"
+
+# Password source — exactly one of these four must be set:
+#
+# Option 1 (recommended): Run a shell command that prints the password to
+# stdout. Works with password managers like pass, gopass, 1Password CLI,
+# Bitwarden CLI, or gpg-encrypted files.
+# Note: For Docker containers, the command's dependencies must be available
+# inside the container. Consider password_file or password_env instead.
+password_command = "pass show email/personal"
+#
+# Option 2: Read the password from a file. Useful with Docker secrets or
+# files mounted from a secrets manager. The file should contain only the
+# password (trailing whitespace is trimmed).
+# password_file = "/run/secrets/email-password"
+#
+# Option 3: Read the password from an environment variable. Useful in
+# Docker/container deployments where secrets are injected via environment.
+# The value is the name of the variable, not the password itself.
+# password_env = "IMAP_PASSWORD_PERSONAL"
+#
+# Option 4 (not recommended): Plaintext password in the config file.
+# Use only for testing or if the config file has strict permissions.
+# password = "my-secret-password"
+
+# Glob-style folder patterns to control which folders are synced.
+# Patterns are evaluated in order; the last matching pattern wins.
+# Prefix a pattern with "!" to exclude matching folders.
+# Supports "*" (any characters) and "?" (single character) wildcards.
+# Default: ["*"] (sync all folders).
+#
+# Examples:
+#   folder_patterns = ["*"]                              # sync everything (default)
+#   folder_patterns = ["*", "!Trash", "!Spam", "!Junk"]  # sync everything except Trash, Spam, Junk
+#   folder_patterns = ["INBOX", "Sent", "Archive"]       # sync only these specific folders
+#   folder_patterns = ["*", "!Draft*"]                   # exclude Drafts and any Draft subfolders
+# folder_patterns = ["*", "!Trash", "!Spam", "!Junk"]
+
+
+# --- Additional account example ---
+#
+# Uncomment and edit to back up a second account.
+
+# [[account]]
+# name = "work"
+# host = "imap.company.com"
+# port = 993
+# username = "employee@company.com"
+# password_command = "secret-tool lookup service imap account work"
+# folder_patterns = ["*", "!Trash", "!Spam"]

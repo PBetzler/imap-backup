@@ -1,0 +1,31 @@
+services:
+  email-backup:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./config:/config:ro
+      - maildir-data:/data/maildir
+      - state-data:/data/state
+    environment:
+      - RUST_LOG=info
+      # --- Option A: password via environment variable ---
+      # Set the variable here or in a .env file. Use password_env in config.toml
+      # to reference it (e.g. password_env = "IMAP_PASSWORD_PERSONAL").
+      # - IMAP_PASSWORD_PERSONAL=
+    # --- Option B: password via Docker secrets ---
+    # Mount secret files into /run/secrets/ and use password_file in config.toml
+    # (e.g. password_file = "/run/secrets/email_password_personal").
+    # secrets:
+    #   - email_password_personal
+    stop_grace_period: 30s
+
+# --- Docker secrets definition (Option B) ---
+# Uncomment to use file-based secrets. Create the secret file before starting:
+#   echo -n 'your-password' > ./secrets/email-password-personal.txt
+# secrets:
+#   email_password_personal:
+#     file: ./secrets/email-password-personal.txt
+
+volumes:
+  maildir-data:
+  state-data:

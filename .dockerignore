@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.dockerignore
+.claude/
+CLAUDE.md
+CONTRIBUTING.md
+IMAP_BACKUP_PROJECT_BRIEF.md
+examples/
+*.md
+!src/README.md

@@ -1,0 +1,30 @@
+# Synology NAS Docker Compose override
+#
+# This compose file uses bind mounts to Synology shared folder paths
+# instead of Docker named volumes. This makes backups visible in
+# File Station and accessible to Hyper Backup for off-site copies.
+#
+# Usage:
+#   1. Create the directories on your Synology NAS (see README.md)
+#   2. Copy your config.toml to /volume1/docker/email-backups/config/
+#   3. Run: docker compose up -d
+
+services:
+  email-backup:
+    build: .
+    image: email-backups:latest
+    restart: unless-stopped
+    volumes:
+      # Config — read-only mount
+      - /volume1/docker/email-backups/config:/config:ro
+      # Maildir storage — on a shared folder visible in File Station
+      - /volume1/mail-backup/maildir:/data/maildir
+      # State database — kept separate from mail data
+      - /volume1/docker/email-backups/state:/data/state
+    environment:
+      - RUST_LOG=info
+    stop_grace_period: 30s
+    # Run as your NAS user (replace 1026:100 with your UID:GID).
+    # Find your UID with: id -u <username>
+    # The default Synology "users" group GID is 100.
+    user: "1026:100"
