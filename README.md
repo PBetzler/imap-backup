@@ -1,6 +1,9 @@
-# email-backups
+# imap-backup
 
-Pull-only IMAP email backup tool with move detection and archival retention. Written in Rust for memory safety when handling untrusted network data.
+> [!WARNING]
+> Vibe-coded and not properly tested yet. Deep down in Work-in-Progress territory. 
+
+Pull-only IMAP email backup tool with move detection and archival retention. Vibe-coded in Rust for memory safety when handling untrusted network data.
 
 Connects to one or more IMAP accounts, downloads all emails into a local Maildir structure, detects server-side moves via composite fingerprinting, and never deletes emails locally — even when they are removed from the server.
 
